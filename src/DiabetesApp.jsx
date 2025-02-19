@@ -1,13 +1,12 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import { AppRouter } from './router';
-import { store } from './store';
+import { AuthProvider } from './auth';
+import { AppRouter } from './router/AppRouter';
 
-export const DiabetesApp = () => (
-  <Provider store={store}>
-    <BrowserRouter>
+// eslint-disable-next-line arrow-body-style
+export const DiabetesApp = () => {
+  return (
+    <AuthProvider>
       <AppRouter />
-    </BrowserRouter>
-  </Provider>
-);
+    </AuthProvider>
+  );
+};

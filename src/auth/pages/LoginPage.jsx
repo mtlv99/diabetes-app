@@ -1,142 +1,33 @@
-import React, { useEffect } from 'react';
-import Swal from 'sweetalert2';
-import './LoginPage.css';
-import { useForm } from '../../hooks/useForm';
-import { useAuthStore } from '../../hooks';
-
-const loginFormFields = {
-  loginEmail: '',
-  loginPassword: '',
-};
-
-const registerFormFields = {
-  registerName: '',
-  registerEmail: '',
-  registerPassword: '',
-  registerPassword2: '',
-};
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 export const LoginPage = () => {
-  const { startLogin, startRegister, errorMessage } = useAuthStore();
+  const { login } = useContext(AuthContext);
 
-  const { loginEmail, loginPassword, onInputChange: onLoginInputChange } = useForm(loginFormFields);
+  // Ver comentario del Navbar.jsx
+  const navigate = useNavigate();
 
-  const {
-    registerName, registerEmail, registerPassword, registerPassword2, onInputChange: onRegisterInputChange,
-  } = useForm(registerFormFields);
+  const onLogin = () => {
+    // Obtiene la ultima ruta donde estuvo el usuario.
+    const lastPath = localStorage.getItem('lastPath') || '/';
 
-  const loginSubmit = (event) => {
-    event.preventDefault();
-    startLogin({ email: loginEmail, password: loginPassword });
+    login('Marco Leon');
+
+    // Ver comentario del Navbar.jsx
+    // Acá se usa `/` para ir al root del app (o el last path).
+    // Con replace para que el usuario no pueda volver al login.
+    navigate(lastPath, { replace: true });
   };
-  const registerSubmit = (event) => {
-    event.preventDefault();
-
-    if (registerPassword !== registerPassword2) {
-      Swal.fire('Error en registro', 'Contraseñas no coinciden', 'error');
-      return;
-    }
-
-    startRegister({ name: registerName, email: registerEmail, password: registerPassword });
-  };
-
-  useEffect(() => {
-    if (errorMessage !== undefined) {
-      Swal.fire('Error en la autenticación', errorMessage, 'error');
-    }
-  }, [errorMessage]);
 
   return (
-    <div className="container login-container">
-      <div className="row">
-        <div className="col-md-6 login-form-1">
-          <h3>Ingreso</h3>
-          <form onSubmit={loginSubmit}>
-            <div className="form-group mb-2">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Correo"
-                name="loginEmail"
-                value={loginEmail}
-                onChange={onLoginInputChange}
-              />
-            </div>
-            <div className="form-group mb-2">
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Contraseña"
-                name="loginPassword"
-                value={loginPassword}
-                onChange={onLoginInputChange}
-              />
-            </div>
-            <div className="d-grid gap-2">
-              <input
-                type="submit"
-                className="btnSubmit"
-                value="Login"
-              />
-            </div>
-          </form>
-        </div>
+    <div className="container mt-5">
 
-        <div className="col-md-6 login-form-2">
-          <h3>Registro</h3>
-          <form onSubmit={registerSubmit}>
-            <div className="form-group mb-2">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Nombre"
-                name="registerName"
-                value={registerName}
-                onChange={onRegisterInputChange}
-              />
-            </div>
-            <div className="form-group mb-2">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Correo"
-                name="registerEmail"
-                value={registerEmail}
-                onChange={onRegisterInputChange}
-              />
-            </div>
-            <div className="form-group mb-2">
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Contraseña"
-                name="registerPassword"
-                value={registerPassword}
-                onChange={onRegisterInputChange}
-              />
-            </div>
+      <h1>Login</h1>
+      <hr />
 
-            <div className="form-group mb-2">
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Repita la contraseña"
-                name="registerPassword2"
-                value={registerPassword2}
-                onChange={onRegisterInputChange}
-              />
-            </div>
+      <button type="button" onClick={onLogin} className="btn btn-primary">Login</button>
 
-            <div className="d-grid gap-2">
-              <input
-                type="submit"
-                className="btnSubmit"
-                value="Crear cuenta"
-              />
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
   );
 };
