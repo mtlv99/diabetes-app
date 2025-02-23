@@ -5,6 +5,7 @@ export const getEnvVariables = () =>
   // import.meta.env;
   // eslint-disable-next-line implicit-arrow-linebreak
   ({
+    // Hay que exportarlas manualmente... :(
     VITE_MODE: import.meta.env.VITE_MODE,
     VITE_API_URL: import.meta.env.VITE_API_URL,
   });
