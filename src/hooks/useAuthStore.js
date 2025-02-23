@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 import { calendarApi } from '../api';
 import {
   clearErrorMessage, onChecking, onLogin, onLogout, onLogoutDiagnoses,
@@ -28,10 +29,25 @@ export const useAuthStore = () => {
     }
   };
 
-  const startRegister = async ({ name, email, password }) => {
+  const startRegister = async ({
+    firstName, lastName, email, password, termsAccepted,
+  }) => {
     dispatch(onChecking());
     try {
-      const { data } = await calendarApi.post('/register/', { name, email, password });
+      const { data: registerData } = await calendarApi.post('/register/', {
+        firstName, lastName, email, password, termsAccepted,
+      });
+
+      if (!registerData.success) {
+        Swal.alert('Error en el registro', registerData.msg, 'error');
+        return false;
+      }
+
+      // Hace un login automatico despues de registrarse.
+      const { data } = await calendarApi.post('/login/', {
+        email, password,
+      });
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('refresh-token', data.refresh);
 
@@ -39,12 +55,15 @@ export const useAuthStore = () => {
       localStorage.setItem('token-init-date', new Date().getTime());
 
       dispatch(onLogin({ name: data.name, uid: data.uid }));
+      return true;
     } catch (error) {
-      dispatch(onLogout(error.response.data?.msg || 'Error interno.'));
+      console.log('error', error);
+      dispatch(onLogout(error.data || 'Error interno.'));
       // Con timeout pequeño para triggerear una ejecucion del useEffect en el LoginPage.jsx
       setTimeout(() => {
         dispatch(clearErrorMessage());
       }, 10);
+      return false;
     }
   };
 
