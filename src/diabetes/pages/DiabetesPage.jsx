@@ -6,10 +6,11 @@ import { FabAddNew } from '../components/FabAddNew';
 import { FabDelete } from '../components/FabDelete';
 
 import { useUiStore, useDiabetesStore, useAuthStore } from '../../hooks';
+import { DiabetesTable } from '../components/DiabetesTable';
 
 export const CalendarPage = () => {
   const { user } = useAuthStore();
-  const { openDateModal, isDateModalOpen } = useUiStore();
+  const { openDiagnosisModal, isDiagnosisModalOpen } = useUiStore();
   const { diagnoses, setActiveDiagnosis, startLoadingDiagnoses } = useDiabetesStore();
 
   useEffect(() => {
@@ -22,13 +23,7 @@ export const CalendarPage = () => {
 
       <h1>Diabetes</h1>
 
-      {diagnoses && diagnoses.map((diagnosis) => (
-        // eslint-disable-next-line max-len
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-        <div key={diagnosis.id} onClick={() => setActiveDiagnosis(diagnosis)}>
-          {diagnosis.id}
-        </div>
-      ))}
+      <DiabetesTable data={diagnoses} />
 
       <DiabetesModal />
       <FabAddNew />

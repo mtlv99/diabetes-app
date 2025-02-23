@@ -1,17 +1,14 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useEffect, useMemo, useState } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
+import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-import DatePicker, { registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { addHours, differenceInSeconds } from 'date-fns';
-import es from 'date-fns/locale/es';
+import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+
 import { useDiabetesStore, useUiStore } from '../../hooks';
-import { getEnvVariables } from '../../helpers';
 
-registerLocale('es', es);
-
+// Customize the modal styles as needed
 const customStyles = {
   content: {
     top: '50%',
@@ -23,155 +20,221 @@ const customStyles = {
   },
 };
 
-// Evita un error en la parte de testing (en el unit test no existe un elemento llamado "#root").
-if (getEnvVariables().VITE_MODE !== 'test') {
-  // El root del App de React.
-  Modal.setAppElement('#root');
-}
-
 export const DiabetesModal = () => {
-  const { closeDateModal, isDateModalOpen } = useUiStore();
+  const { closeDiagnosisModal, isDiagnosisModalOpen } = useUiStore();
   const { activeDiagnosis, startSavingDiagnosis } = useDiabetesStore();
 
-  const [formValues, setFormValues] = useState({
-    title: '',
-    notes: '',
-    start: new Date(),
-    end: addHours(new Date(), 2),
+  // Initialize react-hook-form with default values
+  // You can add or remove default values as needed.
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      pregnancies: 0,
+      glucose: 0,
+      blood_pressure: 0,
+      skin_thickness: 0,
+      insulin: 0,
+      bmi: 0,
+      diabetes_pedigree_function: 0,
+      age: 0,
+    },
   });
 
-  const [formSubmitted, setFormSubmitted] = useState(false);
-
-  const isValid = useMemo(() => {
-    if (!formSubmitted) return '';
-    return (formValues.title.length > 0)
-      ? ''
-      : 'is-invalid';
-  }, [formValues.title, formSubmitted]);
-
+  /**
+   * If `activeDiagnosis` is not null, use it as the
+   * form’s default values. Otherwise, reset to the defaults.
+   */
   useEffect(() => {
-    // Hay un punto donde está en null: al cargar la aplicación.
-    // Por eso es necesaria esta validación.
-    if (activeDiagnosis !== null) {
-      setFormValues({ ...activeDiagnosis });
+    if (activeDiagnosis) {
+      reset({
+        pregnancies: activeDiagnosis.pregnancies ?? 0,
+        glucose: activeDiagnosis.glucose ?? 0,
+        blood_pressure: activeDiagnosis.blood_pressure ?? 0,
+        skin_thickness: activeDiagnosis.skin_thickness ?? 0,
+        insulin: activeDiagnosis.insulin ?? 0,
+        bmi: activeDiagnosis.bmi ?? 0,
+        diabetes_pedigree_function: activeDiagnosis.diabetes_pedigree_function ?? 0,
+        age: activeDiagnosis.age ?? 0,
+      });
+    } else {
+      // Reset to default if no active diagnosis
+      reset({
+        pregnancies: 0,
+        glucose: 0,
+        blood_pressure: 0,
+        skin_thickness: 0,
+        insulin: 0,
+        bmi: 0,
+        diabetes_pedigree_function: 0,
+        age: 0,
+      });
     }
-  }, [activeDiagnosis]);
+  }, [activeDiagnosis, reset]);
 
-  const onInputChange = ({ target }) => {
-    setFormValues({
-      ...formValues,
-      [target.name]: target.value,
-    });
+  /**
+   * Called when form is submitted successfully
+   */
+  const onSubmit = async (data) => {
+    await startSavingDiagnosis(data);
+    closeDiagnosisModal();
   };
 
-  // `changing` emite de valores: 'start', 'end'
-  const onDateChange = (event, changing) => {
-    setFormValues({
-      ...formValues,
-      [changing]: event,
-    });
-  };
-
+  /**
+   * Closes the modal
+   */
   const onCloseModal = () => {
-    closeDateModal();
-  };
-
-  const onSubmit = async (event) => {
-    event.preventDefault();
-
-    setFormSubmitted(true);
-
-    // Si la diferencia es negativa, no deberia permitir guardar el evento.
-    const difference = differenceInSeconds(formValues.end, formValues.start);
-
-    // Si es un NaN, significa que no se ha seleccionado la fecha.
-    if (Number.isNaN(difference) || difference <= 0) {
-      Swal.fire('Fechas incorrectas', 'Las fechas ingresadas no son válidas.', 'warning');
-      console.log('Error en fechas');
-      return;
-    }
-
-    if (formValues.title.length <= 0) return;
-
-    await startSavingDiagnosis(formValues);
-    closeDateModal();
-
-    setFormSubmitted(false);
+    closeDiagnosisModal();
   };
 
   return (
     <Modal
-      isOpen={isDateModalOpen}
+      isOpen={isDiagnosisModalOpen}
       onRequestClose={onCloseModal}
-      // onRequestClose={() => closeDateModal()}
       style={customStyles}
       className="modal"
       overlayClassName="modal-fondo"
       closeTimeoutMS={200}
     >
-      <h1>Nuevo evento</h1>
+      <h1>Nuevo Diagnóstico</h1>
       <hr />
-      <form className="container" onSubmit={onSubmit}>
+
+      {/*
+        Use `handleSubmit(onSubmit)` from react-hook-form
+        instead of manually handling form data
+      */}
+      <form className="container" onSubmit={handleSubmit(onSubmit)}>
 
         <div className="form-group mb-2">
-          <label>Fecha y hora inicio</label>
-          <DatePicker
-            selected={formValues.start}
-            onChange={(event) => onDateChange(event, 'start')}
+          <label htmlFor="">Embarazos</label>
+          <input
+            type="number"
             className="form-control"
-            dateFormat="Pp"
-            locale="es"
-            showTimeSelect
-            timeCaption="Hora"
+            {...register('pregnancies', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
           />
+          {errors.pregnancies && (
+            <small className="text-danger">{errors.pregnancies.message}</small>
+          )}
         </div>
 
         <div className="form-group mb-2">
-          <label>Fecha y hora fin</label>
-          <DatePicker
-            minDate={formValues.start}
-            selected={formValues.end}
-            onChange={(event) => onDateChange(event, 'end')}
+          <label>Glucosa</label>
+          <input
+            type="number"
             className="form-control"
-            dateFormat="Pp"
-            locale="es"
-            showTimeSelect
-            timeCaption="Hora"
+            {...register('glucose', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
           />
+          {errors.glucose && (
+            <small className="text-danger">{errors.glucose.message}</small>
+          )}
+        </div>
+
+        <div className="form-group mb-2">
+          <label>Presión Sanguínea</label>
+          <input
+            type="number"
+            className="form-control"
+            {...register('blood_pressure', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
+          />
+          {errors.blood_pressure && (
+            <small className="text-danger">{errors.blood_pressure.message}</small>
+          )}
+        </div>
+
+        <div className="form-group mb-2">
+          <label>Grosor de la Piel</label>
+          <input
+            type="number"
+            className="form-control"
+            {...register('skin_thickness', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
+          />
+          {errors.skin_thickness && (
+            <small className="text-danger">{errors.skin_thickness.message}</small>
+          )}
+        </div>
+
+        <div className="form-group mb-2">
+          <label>Insulina</label>
+          <input
+            type="number"
+            className="form-control"
+            {...register('insulin', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
+          />
+          {errors.insulin && (
+            <small className="text-danger">{errors.insulin.message}</small>
+          )}
+        </div>
+
+        <div className="form-group mb-2">
+          <label>Índice de Masa Corporal</label>
+          <input
+            type="number"
+            step="any"
+            className="form-control"
+            {...register('bmi', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
+          />
+          {errors.bmi && (
+            <small className="text-danger">{errors.bmi.message}</small>
+          )}
+        </div>
+
+        <div className="form-group mb-2">
+          <label>Función Pedigree</label>
+          <input
+            type="number"
+            step="any"
+            className="form-control"
+            {...register('diabetes_pedigree_function', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
+          />
+          {errors.diabetes_pedigree_function && (
+            <small className="text-danger">
+              {errors.diabetes_pedigree_function.message}
+            </small>
+          )}
+        </div>
+
+        <div className="form-group mb-2">
+          <label>Edad</label>
+          <input
+            type="number"
+            className="form-control"
+            {...register('age', {
+              required: 'Este campo es requerido',
+              min: { value: 0, message: 'No puede ser negativo' },
+            })}
+          />
+          {errors.age && (
+            <small className="text-danger">{errors.age.message}</small>
+          )}
         </div>
 
         <hr />
-        <div className="form-group mb-2">
-          <label>Titulo y notas</label>
-          <input
-            type="text"
-            className={`form-control ${isValid}`}
-            placeholder="Título del evento"
-            name="title"
-            autoComplete="off"
-            value={formValues.title}
-            onChange={onInputChange}
-          />
-          <small id="emailHelp" className="form-text text-muted">Una descripción corta</small>
-        </div>
 
-        <div className="form-group mb-2">
-          <textarea
-            type="text"
-            className="form-control"
-            placeholder="Notas"
-            rows="5"
-            name="notes"
-            value={formValues.notes}
-            onChange={onInputChange}
-          />
-          <small id="emailHelp" className="form-text text-muted">Información adicional</small>
-        </div>
-
-        <button
-          type="submit"
-          className="btn btn-outline-primary btn-block"
-        >
+        <button type="submit" className="btn btn-outline-primary btn-block">
           <i className="far fa-save" />
           <span> Guardar</span>
         </button>

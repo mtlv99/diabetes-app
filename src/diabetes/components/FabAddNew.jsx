@@ -2,23 +2,24 @@ import { addHours } from 'date-fns';
 import { useDiabetesStore, useUiStore } from '../../hooks';
 
 export const FabAddNew = () => {
-  const { openDateModal } = useUiStore();
+  const { openDiagnosisModal } = useUiStore();
   const { setActiveDiagnosis } = useDiabetesStore();
 
   const handleClickNew = () => {
     setActiveDiagnosis({
       // Si no tiene un id, significa que es un diagnosis nuevo.
-      title: '', // required
-      notes: '',
-      start: new Date(), // required
-      end: addHours(new Date(), 2), // required
-      bgColor: '#fafafa',
-      user: {
-        // id: '123',
-        // name: 'Marco',
-      },
+      pregnancies: 0,
+      glucose: 0,
+      blood_pressure: 0,
+      skin_thickness: 0,
+      insulin: 0,
+      bmi: 0,
+      diabetes_pedigree_function: 0,
+      age: 0,
+      created: new Date(),
+      has_diabetes: null,
     });
-    openDateModal();
+    openDiagnosisModal();
   };
 
   return (

@@ -1,32 +1,32 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { onClearActiveDiagnosis, onCloseDateModal, onOpenDateModal } from '../store';
+import { onClearActiveDiagnosis, onCloseDiagnosisModal, onOpenDiagnosisModal } from '../store';
 
 export const useUiStore = () => {
   const dispatch = useDispatch();
 
-  const { isDateModalOpen } = useSelector((state) => state.ui);
+  const { isDiagnosisModalOpen } = useSelector((state) => state.ui);
 
-  const openDateModal = () => {
-    dispatch(onOpenDateModal());
+  const openDiagnosisModal = () => {
+    dispatch(onOpenDiagnosisModal());
   };
 
-  const closeDateModal = () => {
-    dispatch(onCloseDateModal());
+  const closeDiagnosisModal = () => {
+    dispatch(onCloseDiagnosisModal());
     dispatch(onClearActiveDiagnosis());
   };
 
-  const toggleDateModal = () => {
+  const toggleDiagnosisModal = () => {
     // eslint-disable-next-line no-unused-expressions
-    isDateModalOpen ? closeDateModal() : openDateModal();
+    isDiagnosisModalOpen ? closeDiagnosisModal() : openDiagnosisModal();
   };
 
   return {
     // Propiedades
-    isDateModalOpen,
+    isDiagnosisModalOpen,
 
     // Metodos
-    openDateModal,
-    closeDateModal,
-    toggleDateModal,
+    openDiagnosisModal,
+    closeDiagnosisModal,
+    toggleDiagnosisModal,
   };
 };

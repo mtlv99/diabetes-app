@@ -20,17 +20,24 @@ export const useDiabetesStore = () => {
     // uno existente, es por medio de la existencia de un `id`.
     // eslint-disable-next-line no-underscore-dangle
     try {
-      if (diagnosis.id) {
-        // Actualizando
-        await calendarApi.put(`/diagnoses/${diagnosis.id}`, diagnosis);
+      // if (diagnosis.id) {
+      //   // Actualizando
+      //   await calendarApi.put(`/diagnoses/${diagnosis.id}`, diagnosis);
 
-        // se usa spread para romper la referencia al objeto (crea uno nuevo).
-        dispatch(onUpdateDiagnosis({ ...diagnosis, user }));
-        return;
-      }
+      //   // se usa spread para romper la referencia al objeto (crea uno nuevo).
+      //   dispatch(onUpdateDiagnosis({ ...diagnosis, user }));
+      //   return;
+      // }
 
-      const { data } = await calendarApi.post('/diagnoses', diagnosis);
-      dispatch(onAddNewDiagnosis({ ...diagnosis, id: data.diagnosis.id, user }));
+      const { data } = await calendarApi.post('/diagnoses/', diagnosis);
+      dispatch(onAddNewDiagnosis({
+        ...diagnosis,
+        id: data.id,
+        user_id: data.user_id,
+        created: data.created,
+        has_diabetes: data.has_diabetes,
+        user,
+      }));
     } catch (error) {
       console.log(error);
       Swal.fire('Error al guardar', error.response.data?.msg, 'error');
