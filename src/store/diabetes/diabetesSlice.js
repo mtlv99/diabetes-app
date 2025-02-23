@@ -30,16 +30,12 @@ export const diabetesSlice = createSlice({
         return diagnosis;
       });
     },
-    onDeleteDiagnosis: (state) => {
+    onDeleteDiagnosis: (state, { payload }) => {
       // Acá filtra por todos los elementos que NO tengan el id del diagnosis activo,
       // por que basicamente termina excluyendo/borrando el diagnosis activo.
       // También se debe comprobar si hay un diagnosis activo para poder borrar:
       // si no, tratará de leer un 'id' de una propiedad en null.
-      if (state.activeDiagnosis) {
-        state.diagnoses = state.diagnoses
-          .filter((diagnosis) => diagnosis.id !== state.activeDiagnosis.id);
-        state.activeDiagnosis = null;
-      }
+      state.diagnoses = state.diagnoses.filter((diagnosis) => diagnosis.id !== payload.id);
     },
     onLoadDiagnoses: (state, { payload = [] }) => {
       state.isLoadingDiagnoses = false;

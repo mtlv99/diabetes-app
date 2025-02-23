@@ -44,11 +44,26 @@ export const useDiabetesStore = () => {
     }
   };
 
-  const startDeletingDiagnosis = async () => {
-    try {
-      await calendarApi.delete(`/diagnoses/${activeDiagnosis.id}`, activeDiagnosis);
+  const startDeletingDiagnosis = async (id) => {
+    console.log('deletion', { id });
 
-      dispatch(onDeleteDiagnosis());
+    try {
+      await calendarApi.delete('/diagnoses/', {
+        data: { id },
+      });
+
+      dispatch(onDeleteDiagnosis({ id }));
+
+      // Show a success toast when deletion is complete
+      Swal.fire({
+        icon: 'success',
+        title: 'Diagnóstico eliminado con éxito',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
     } catch (error) {
       console.log(error);
       Swal.fire('Error al borrar', error.response.data?.msg, 'error');

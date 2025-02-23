@@ -3,7 +3,6 @@ import { Navbar } from '../components/Navbar';
 
 import { DiabetesModal } from '../components/DiabetesModal';
 import { FabAddNew } from '../components/FabAddNew';
-import { FabDelete } from '../components/FabDelete';
 
 import { useUiStore, useDiabetesStore, useAuthStore } from '../../hooks';
 import { DiabetesTable } from '../components/DiabetesTable';
@@ -27,7 +26,6 @@ export const CalendarPage = () => {
 
       <DiabetesModal />
       <FabAddNew />
-      <FabDelete />
     </>
   );
 };
