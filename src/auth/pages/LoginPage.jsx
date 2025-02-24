@@ -98,7 +98,12 @@ export const LoginPage = () => {
         </Tabs>
 
         {tabValue === 0 && (
-          <Box component="form" noValidate onSubmit={handleLoginSubmit(onLoginSubmit)} sx={{ mt: 2 }}>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleLoginSubmit(onLoginSubmit)}
+            sx={{ mt: 2 }}
+          >
             <TextField
               label="Correo"
               variant="outlined"
@@ -137,7 +142,12 @@ export const LoginPage = () => {
         )}
 
         {tabValue === 1 && (
-          <Box component="form" noValidate onSubmit={handleRegisterSubmit(onRegisterSubmit)} sx={{ mt: 2 }}>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleRegisterSubmit(onRegisterSubmit)}
+            sx={{ mt: 2 }}
+          >
             <TextField
               label="Primer nombre"
               variant="outlined"
@@ -185,9 +195,9 @@ export const LoginPage = () => {
               helperText={registerErrors.registerPassword?.message}
               {...registerRegister('registerPassword', {
                 required: 'La contraseña es requerida',
-                minLength: {
-                  value: 4,
-                  message: 'Mínimo 4 caracteres',
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{6,}$/,
+                  message: 'La contraseña debe tener al menos 6 caracteres, una minúscula, una mayúscula y un carácter especial',
                 },
               })}
             />
