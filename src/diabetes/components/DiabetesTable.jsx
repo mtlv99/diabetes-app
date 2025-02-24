@@ -23,7 +23,7 @@ export const DiabetesTable = ({ data = [] }) => {
   const handleDiagnosisDelete = (id) => {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: 'Una vez eliminado, no podrás recuperar este diagnóstico.',
+      text: `Una vez eliminado, no podrás recuperar este diagnóstico. (ID ${id})`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
@@ -36,7 +36,7 @@ export const DiabetesTable = ({ data = [] }) => {
   };
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ mt: 4 }}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
-import { calendarApi } from '../api';
+import { diabetesApi } from '../api';
 import {
   clearErrorMessage, onChecking, onLogin, onLogout, onLogoutDiagnoses,
 } from '../store';
@@ -12,7 +12,7 @@ export const useAuthStore = () => {
   const startLogin = async ({ email, password }) => {
     dispatch(onChecking());
     try {
-      const { data } = await calendarApi.post('/login/', { email, password });
+      const { data } = await diabetesApi.post('/login/', { email, password });
       localStorage.setItem('token', data.token);
       localStorage.setItem('refresh-token', data.refresh);
 
@@ -34,7 +34,7 @@ export const useAuthStore = () => {
   }) => {
     dispatch(onChecking());
     try {
-      const { data: registerData } = await calendarApi.post('/register/', {
+      const { data: registerData } = await diabetesApi.post('/register/', {
         firstName, lastName, email, password, termsAccepted,
       });
 
@@ -44,7 +44,7 @@ export const useAuthStore = () => {
       }
 
       // Hace un login automatico despues de registrarse.
-      const { data } = await calendarApi.post('/login/', {
+      const { data } = await diabetesApi.post('/login/', {
         email, password,
       });
 
@@ -57,7 +57,8 @@ export const useAuthStore = () => {
       dispatch(onLogin({ name: data.name, uid: data.uid }));
       return true;
     } catch (error) {
-      console.log('error', error);
+      // eslint-disable-next-line no-console
+      console.error('Error en registro', error);
       dispatch(onLogout(error.data || 'Error interno.'));
       // Con timeout pequeño para triggerear una ejecucion del useEffect en el LoginPage.jsx
       setTimeout(() => {
@@ -75,7 +76,7 @@ export const useAuthStore = () => {
     try {
       // Si el token obtenido de localStorage sigue siendo valido,
       // se regenera otro y se guarda immediatamente.
-      const { data } = await calendarApi.post('/token/refresh/', { refresh });
+      const { data } = await diabetesApi.post('/token/refresh/', { refresh });
 
       localStorage.setItem('token', data.access);
       localStorage.setItem('token-init-date', new Date().getTime());

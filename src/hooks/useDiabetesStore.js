@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import {
   onAddNewDiagnosis, onDeleteDiagnosis, onSetActiveDiagnosis, onUpdateDiagnosis, onLoadDiagnoses,
 } from '../store';
-import { calendarApi } from '../api';
+import { diabetesApi } from '../api';
 
 export const useDiabetesStore = () => {
   const dispatch = useDispatch();
@@ -22,14 +22,15 @@ export const useDiabetesStore = () => {
     try {
       // if (diagnosis.id) {
       //   // Actualizando
-      //   await calendarApi.put(`/diagnoses/${diagnosis.id}`, diagnosis);
+      //   await diabetesApi.put(`/diagnoses/${diagnosis.id}`, diagnosis);
 
       //   // se usa spread para romper la referencia al objeto (crea uno nuevo).
       //   dispatch(onUpdateDiagnosis({ ...diagnosis, user }));
       //   return;
       // }
 
-      const { data } = await calendarApi.post('/diagnoses/', diagnosis);
+      const { data } = await diabetesApi.post('/diagnoses/', diagnosis);
+
       dispatch(onAddNewDiagnosis({
         ...diagnosis,
         id: data.id,
@@ -38,17 +39,30 @@ export const useDiabetesStore = () => {
         has_diabetes: data.has_diabetes,
         user,
       }));
+
+      // Show a success toast when deletion is complete
+      Swal.fire({
+        icon: 'success',
+        title: 'Diagnóstico agregado con éxito',
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      return true;
     } catch (error) {
-      console.log(error);
+      // eslint-disable-next-line no-console
+      console.error('Error al guardar', error);
       Swal.fire('Error al guardar', error.response.data?.msg, 'error');
+      return false;
     }
   };
 
   const startDeletingDiagnosis = async (id) => {
-    console.log('deletion', { id });
-
     try {
-      await calendarApi.delete('/diagnoses/', {
+      await diabetesApi.delete('/diagnoses/', {
         data: { id },
       });
 
@@ -59,26 +73,26 @@ export const useDiabetesStore = () => {
         icon: 'success',
         title: 'Diagnóstico eliminado con éxito',
         toast: true,
-        position: 'top-end',
+        position: 'bottom-end',
         showConfirmButton: false,
-        timer: 2000,
         timerProgressBar: true,
       });
     } catch (error) {
-      console.log(error);
+      // eslint-disable-next-line no-console
+      console.log('Error al borrar', error);
       Swal.fire('Error al borrar', error.response.data?.msg, 'error');
     }
   };
 
   const startLoadingDiagnoses = async () => {
     try {
-      const { data } = await calendarApi.get('/diagnoses');
+      const { data } = await diabetesApi.get('/diagnoses');
       const foundDiagnoses = data.Diagnosis;
 
       dispatch(onLoadDiagnoses(foundDiagnoses));
     } catch (error) {
-      console.log('Error cargando diagnosticos');
-      console.log(error);
+      // eslint-disable-next-line no-console
+      console.error('Error cargando diagnosticos', error);
     }
   };
 

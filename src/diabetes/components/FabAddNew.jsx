@@ -1,4 +1,5 @@
-import { addHours } from 'date-fns';
+import { Fab } from '@mui/material';
+import { Add } from '@mui/icons-material';
 import { useDiabetesStore, useUiStore } from '../../hooks';
 
 export const FabAddNew = () => {
@@ -22,14 +23,16 @@ export const FabAddNew = () => {
     openDiagnosisModal();
   };
 
+  const fabStyle = {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+  };
+
   return (
-    // eslint-disable-next-line jsx-a11y/control-has-associated-label
-    <button
-      type="button"
-      className="btn btn-primary fab"
-      onClick={handleClickNew}
-    >
-      <i className="fas fa-plus" />
-    </button>
+    <Fab variant="extended" color="primary" style={fabStyle} onClick={handleClickNew}>
+      <Add sx={{ mr: 1 }} />
+      Agregar
+    </Fab>
   );
 };

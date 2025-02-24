@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { CircularProgress, Typography } from '@mui/material';
 import { LoginPage } from '../auth';
-import { CalendarPage } from '../diabetes';
+import { DiabetesPage } from '../diabetes';
 import { useAuthStore } from '../hooks';
 
 export const AppRouter = () => {
@@ -18,7 +19,7 @@ export const AppRouter = () => {
         height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center',
       }}
       >
-        <h3>Cargando...</h3>
+        <CircularProgress />
       </div>
     );
   }
@@ -36,7 +37,7 @@ export const AppRouter = () => {
           )
           : (
             <>
-              <Route path="/" element={<CalendarPage />} />
+              <Route path="/" element={<DiabetesPage />} />
               <Route path="/*" element={<Navigate to="/" />} />
             </>
           )

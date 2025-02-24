@@ -1,14 +1,21 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import {
+  Box, Tabs, Tab, TextField, Button, Checkbox, FormControlLabel, Typography,
+} from '@mui/material';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import { useAuthStore } from '../../hooks';
-import './LoginPage.css';
 
 export const LoginPage = () => {
   const { startLogin, startRegister, errorMessage } = useAuthStore();
+  const [tabValue, setTabValue] = useState(0);
 
-  // --- Login form ---
+  const handleChangeTab = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const {
     register: loginRegister,
     handleSubmit: handleLoginSubmit,
@@ -24,7 +31,6 @@ export const LoginPage = () => {
     startLogin({ email: data.loginEmail, password: data.loginPassword });
   };
 
-  // --- Register form ---
   const {
     register: registerRegister,
     handleSubmit: handleRegisterSubmit,
@@ -41,14 +47,9 @@ export const LoginPage = () => {
     },
   });
 
-  // Watch password for matching check
   const watchPassword = watch('registerPassword', '');
 
   const onRegisterSubmit = (data) => {
-    // If you rely on react-hook-form validations, these checks can be omitted;
-    // but if you want to do additional checks, you can still do them here.
-
-    // We already validate terms/password mismatch below, so no need for extra checks here.
     startRegister({
       firstName: data.registerFirstName,
       lastName: data.registerLastName,
@@ -58,7 +59,6 @@ export const LoginPage = () => {
     });
   };
 
-  // Show any global errors coming from the auth store
   useEffect(() => {
     if (errorMessage !== undefined) {
       Swal.fire('Error en la autenticación', errorMessage, 'error');
@@ -66,185 +66,165 @@ export const LoginPage = () => {
   }, [errorMessage]);
 
   return (
-    <div className="container login-container">
-      <div className="row">
-        {/* --- LOGIN FORM --- */}
-        <div className="col-md-6 login-form-1">
-          <h3>Ingreso</h3>
-          <form onSubmit={handleLoginSubmit(onLoginSubmit)}>
-            <div className="form-group mb-2">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Correo"
-                {...loginRegister('loginEmail', {
-                  required: 'El correo es requerido',
-                  pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: 'Formato de correo inválido',
-                  },
-                })}
-              />
-              {loginErrors.loginEmail && (
-                <small className="text-danger">
-                  {loginErrors.loginEmail.message}
-                </small>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#E3F2FD',
+      }}
+    >
+      <Box
+        sx={{
+          width: { xs: '90%', sm: 400 },
+          p: 3,
+          backgroundColor: '#fff',
+          borderRadius: 2,
+          boxShadow: 3,
+        }}
+      >
+        <Box sx={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2,
+        }}
+        >
+          <LocalHospitalIcon sx={{ mr: 1 }} />
+          <Typography variant="h5">Diabetes App</Typography>
+        </Box>
+
+        <Tabs value={tabValue} onChange={handleChangeTab} variant="fullWidth">
+          <Tab label="Ingreso" />
+          <Tab label="Registro" />
+        </Tabs>
+
+        {tabValue === 0 && (
+          <Box component="form" noValidate onSubmit={handleLoginSubmit(onLoginSubmit)} sx={{ mt: 2 }}>
+            <TextField
+              label="Correo"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              error={!!loginErrors.loginEmail}
+              helperText={loginErrors.loginEmail?.message}
+              {...loginRegister('loginEmail', {
+                required: 'El correo es requerido',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Formato de correo inválido',
+                },
+              })}
+            />
+            <TextField
+              label="Contraseña"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              type="password"
+              error={!!loginErrors.loginPassword}
+              helperText={loginErrors.loginPassword?.message}
+              {...loginRegister('loginPassword', {
+                required: 'La contraseña es requerida',
+                minLength: {
+                  value: 4,
+                  message: 'Mínimo 4 caracteres',
+                },
+              })}
+            />
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+              Iniciar Sesión
+            </Button>
+          </Box>
+        )}
+
+        {tabValue === 1 && (
+          <Box component="form" noValidate onSubmit={handleRegisterSubmit(onRegisterSubmit)} sx={{ mt: 2 }}>
+            <TextField
+              label="Primer nombre"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              error={!!registerErrors.registerFirstName}
+              helperText={registerErrors.registerFirstName?.message}
+              {...registerRegister('registerFirstName', {
+                required: 'El primer nombre es requerido',
+              })}
+            />
+            <TextField
+              label="Segundo nombre"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              error={!!registerErrors.registerLastName}
+              helperText={registerErrors.registerLastName?.message}
+              {...registerRegister('registerLastName', {
+                required: 'El segundo nombre es requerido',
+              })}
+            />
+            <TextField
+              label="Correo"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              error={!!registerErrors.registerEmail}
+              helperText={registerErrors.registerEmail?.message}
+              {...registerRegister('registerEmail', {
+                required: 'El correo es requerido',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Formato de correo inválido',
+                },
+              })}
+            />
+            <TextField
+              label="Contraseña"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              type="password"
+              error={!!registerErrors.registerPassword}
+              helperText={registerErrors.registerPassword?.message}
+              {...registerRegister('registerPassword', {
+                required: 'La contraseña es requerida',
+                minLength: {
+                  value: 4,
+                  message: 'Mínimo 4 caracteres',
+                },
+              })}
+            />
+            <TextField
+              label="Repita la contraseña"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              type="password"
+              error={!!registerErrors.registerPassword2}
+              helperText={registerErrors.registerPassword2?.message}
+              {...registerRegister('registerPassword2', {
+                required: 'Por favor repita la contraseña',
+                validate: (value) => value === watchPassword || 'Las contraseñas no coinciden',
+              })}
+            />
+            <FormControlLabel
+              control={(
+                <Checkbox
+                  {...registerRegister('acceptTerms', {
+                    required: 'Debe aceptar los términos y condiciones',
+                  })}
+                />
               )}
-            </div>
-
-            <div className="form-group mb-2">
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Contraseña"
-                {...loginRegister('loginPassword', {
-                  required: 'La contraseña es requerida',
-                  minLength: {
-                    value: 4,
-                    message: 'Mínimo 4 caracteres',
-                  },
-                })}
-              />
-              {loginErrors.loginPassword && (
-                <small className="text-danger">
-                  {loginErrors.loginPassword.message}
-                </small>
-              )}
-            </div>
-
-            <div className="d-grid gap-2">
-              <input
-                type="submit"
-                className="btnSubmit"
-                value="Login"
-              />
-            </div>
-          </form>
-        </div>
-
-        {/* --- REGISTER FORM --- */}
-        <div className="col-md-6 login-form-2">
-          <h3>Registro</h3>
-          <form onSubmit={handleRegisterSubmit(onRegisterSubmit)}>
-            <div className="form-group mb-2">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Primer nombre"
-                {...registerRegister('registerFirstName', {
-                  required: 'El primer nombre es requerido',
-                })}
-              />
-              {registerErrors.registerFirstName && (
-                <small className="text-danger">
-                  {registerErrors.registerFirstName.message}
-                </small>
-              )}
-            </div>
-
-            <div className="form-group mb-2">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Segundo nombre"
-                {...registerRegister('registerLastName', {
-                  required: 'El segundo nombre es requerido',
-                })}
-              />
-              {registerErrors.registerLastName && (
-                <small className="text-danger">
-                  {registerErrors.registerLastName.message}
-                </small>
-              )}
-            </div>
-
-            <div className="form-group mb-2">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Correo"
-                {...registerRegister('registerEmail', {
-                  required: 'El correo es requerido',
-                  pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: 'Formato de correo inválido',
-                  },
-                })}
-              />
-              {registerErrors.registerEmail && (
-                <small className="text-danger">
-                  {registerErrors.registerEmail.message}
-                </small>
-              )}
-            </div>
-
-            <div className="form-group mb-2">
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Contraseña"
-                {...registerRegister('registerPassword', {
-                  required: 'La contraseña es requerida',
-                  minLength: {
-                    value: 4,
-                    message: 'Mínimo 4 caracteres',
-                  },
-                })}
-              />
-              {registerErrors.registerPassword && (
-                <small className="text-danger">
-                  {registerErrors.registerPassword.message}
-                </small>
-              )}
-            </div>
-
-            <div className="form-group mb-2">
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Repita la contraseña"
-                {...registerRegister('registerPassword2', {
-                  required: 'Por favor repita la contraseña',
-                  validate: (value) => value === watchPassword || 'Las contraseñas no coinciden',
-                })}
-              />
-              {registerErrors.registerPassword2 && (
-                <small className="text-danger">
-                  {registerErrors.registerPassword2.message}
-                </small>
-              )}
-            </div>
-
-            <div className="form-group mb-2">
-              <input
-                type="checkbox"
-                id="acceptTerms"
-                {...registerRegister('acceptTerms', {
-                  required: 'Debe aceptar los términos y condiciones',
-                })}
-              />
-              { /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
-              <label htmlFor="acceptTerms" className="ms-1">
-                Acepto los términos y condiciones
-              </label>
-
-              {registerErrors.acceptTerms && (
-                <small className="text-danger d-block">
-                  {registerErrors.acceptTerms.message}
-                </small>
-              )}
-            </div>
-
-            <div className="d-grid gap-2">
-              <input
-                type="submit"
-                className="btnSubmit"
-                value="Crear cuenta"
-              />
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+              label="Acepto los términos y condiciones"
+            />
+            {registerErrors.acceptTerms && (
+              <Box sx={{ color: 'error.main', fontSize: 14 }}>
+                {registerErrors.acceptTerms.message}
+              </Box>
+            )}
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+              Crear cuenta
+            </Button>
+          </Box>
+        )}
+      </Box>
+    </Box>
   );
 };
