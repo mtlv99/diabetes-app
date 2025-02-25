@@ -6,6 +6,17 @@ Authors:
 - Marco León Vargas
 - Dwight García Esquivel
 
+## Technologies Used
+
+- **Frontend Library**: React
+- **Development Framework**: Vite
+- **UI Library**: Material UI (MUI)
+- **State Management**: Redux Toolkit
+- **Routing**: React Router DOM
+- **Form Handling**: React Hook Form
+- **HTTP Client**: Axios
+- **Alerts & Notifications**: SweetAlert2
+- **Linting**: ESLint with Airbnb config
 
 ## Available Scripts
 
