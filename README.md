@@ -1,6 +1,6 @@
 # Diabetes - App
 
-Web application for diabetes management.
+Web application for diabetes management. You can find the backend [here](https://github.com/mtlv99/diabetes-backend).
 
 Authors:
 - Marco León Vargas
