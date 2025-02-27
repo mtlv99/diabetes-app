@@ -42,6 +42,8 @@ export const LayoutBase = ({ children }) => {
             Diabetes App
           </Typography>
 
+          <Typography variant="p" sx={{ mr: 1 }}>{user?.name}</Typography>
+
           <IconButton
             size="large"
             edge="end"
